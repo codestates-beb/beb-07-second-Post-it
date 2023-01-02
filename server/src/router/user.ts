@@ -14,4 +14,4 @@ router.get("/mypage/:user_id", userController.mypage);
 
 router.post("/send", userController.send);
 
-module.exports = router;
+export default router;

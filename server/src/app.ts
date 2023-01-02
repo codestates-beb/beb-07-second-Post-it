@@ -4,8 +4,8 @@ import AppDataSource from './db/data-source';
 
 const app : Express = express();
 
-const indexRouter = require("./router/index")
-const userRouter = require("./router/user")
+import indexRouter from "./router/index";
+import userRouter from "./router/user";
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
