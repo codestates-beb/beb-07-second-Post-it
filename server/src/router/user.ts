@@ -1,13 +1,15 @@
 import express, {Request, Response ,Router} from "express";
 const router : Router = express.Router();
 
-const cookieParser = require('cookie-parser');
+router.get("/", function (req : Request, res : Response) {
+    console.log("//")
+    return res.status(200).send("hello user")
+})
 
-router.use(cookieParser());
-
-router.post("/signup", function (req, res) {
+router.get("/signup", function (req : Request, res : Response) {
+    console.log("/signup")
     return res.status(200).send("user signup hello world");
 })
 
 
-export default router;
+module.exports = router;

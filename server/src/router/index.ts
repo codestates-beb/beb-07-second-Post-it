@@ -5,4 +5,4 @@ router.use("/", function(req,res) {
     return res.status(200).send("index router, hello world");
 });
 
-export default router;
+module.exports = router;
