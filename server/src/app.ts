@@ -5,8 +5,8 @@ const app : Express = express();
 // require("dotenv").config();
 // const PORT = process.env.PORT || 4000;
 
-const indexRouter = require("./router/index")
-const userRouter = require("./router/user")
+import indexRouter from "./router/index";
+import userRouter from "./router/user";
 
 app.use('/', indexRouter);
 app.use('/users', userRouter);
