@@ -1,7 +1,4 @@
 {
-  "include": [
-    "src/**/*.ts", "src/app.ts"
-  ],
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
@@ -13,6 +10,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noImplicitReturns": false,
-    "strictPropertyInitialization": false,                             /* Skip type checking all .d.ts files. */
+    "strictPropertyInitialization": false,
   }
 }
