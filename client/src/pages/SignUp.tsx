@@ -18,11 +18,14 @@ function SignUp() {
 
     async function submint(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         axios.post("http://localhost:4000/users/signup",
-            {signUp}
+            signUp
         ).then((response) => {
-            console.log(response.data);
+            if (response.data) {
+                // eslint-disable-next-line no-restricted-globals
+                location.href="/login";
+                signUpSet({nickname : "", password : ""})
+            }
         })
-        sessionStorage.setItem("user_id", signUp.nickname);
     }
 
     return (
