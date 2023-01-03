@@ -17,14 +17,16 @@ function Login() {
     }
 
     async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        console.log(login)
         await axios.post("http://localhost:4000/users/login",
-            {login}
+            login //param
         ).then((response) => {
-            console.log(response.data);
+            if(response.data){
+                // eslint-disable-next-line no-restricted-globals
+                location.href="/";
+                sessionStorage.setItem("user_id", login.nickname);
+                loginSet({nickname : "", password : ""});
+            }
         })
-        sessionStorage.setItem("user_id", login.nickname);
-
     }
 
     async function moveSignUp(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -40,7 +42,7 @@ function Login() {
                         <h1>Login</h1>
                         <input placeholder='ID' onChange={e => IDChange(e)} />
                         <input placeholder='PW' type="password" onChange={e => PWChange(e)} />
-                        <button onClick={e => submit(e)}><b>Create</b></button>
+                        <button onClick={e => submit(e)}><b>Login</b></button>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <button onClick={e => moveSignUp(e)}><b>SignUp</b></button>
 
