@@ -12,7 +12,7 @@ router.post("/signup", userController.signup);
 
 router.post("/login", userController.login);
 
-router.get("/mypage/:address", userController.mypage);
+router.get("/mypage/:id", userController.mypage);
 
 router.post("/send", userController.send);
 

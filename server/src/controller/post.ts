@@ -1,23 +1,39 @@
 import {Request, Response} from "express";
+import internal from "stream";
 import AppDataSource from "../db/data-source";
 import post from "../entity/post";
 
 async function postlist (req: Request, res: Response) {
-    //여기도 Join이 필요해보임
-    //정민님과 함꼐 하는 게시글리스트시간!!!!!
-    if(!req) {
+
+    if(!req.query.id) {
         return res.status(400).send("not request");
     }
-    const posts = await AppDataSource //join써서 nickname가져오기
+    const id = req.query.id;
+
+    const posts = await AppDataSource
       .getRepository(post)
       .createQueryBuilder()
       .select()
+      .where("id >= :id*10+1 AND id <= :id*10+10", {id:id})
       .getMany()
 
     if(!posts) {
         return res.status(400).send("No posts");
     }
-    return res.status(200).send(posts);
+    
+    const data = [];
+    
+    for(let i = 0; i<10;i++) {
+        const temp = {
+            id : posts[i].id,
+            title : posts[i].title,
+            nickname : posts[i].user_id,
+            created_at : posts[i].created_at,
+            views : posts[i].views
+        }
+        data.push(temp);
+    }
+    return res.status(200).send(data);
 }
 
 async function wpost (req: Request, res: Response) {

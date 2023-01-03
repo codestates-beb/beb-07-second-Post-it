@@ -8,11 +8,12 @@ import nft from "../entity/nft";
 async function insert (req : Request, res: Response) {
     const info = {
         user_id : req.body.user_id,
-        token_id : req.body.token_id,
-        tx_hash : req.body.tx_hash
+        title : req.body.title,
+        content : req.body.content,
+        views : req.body.views
     }
 
-    const userRepo = AppDataSource.getRepository(nft);
+    const userRepo = AppDataSource.getRepository(post);
     const users = userRepo.create(info);
 
     await userRepo
@@ -77,23 +78,50 @@ async function login (req : Request, res: Response) {
         .getOne()
         
     if(users) {
-        return res.status(200).send(true);
+        return res.status(200).send(users);
     }
     else {
-        return res.status(400).send(false);
+        return res.status(400).send("login error");
     }
 }
 
 async function mypage(req : Request, res:Response) {
 
-    //여기도 join들어갈것같은데;;?
+    if(!req) {
+        return res.status(400).send("no request");
+    }
     const users = await AppDataSource
         .getRepository(user)
         .createQueryBuilder()
         .select()
+        .where("id = :id", {id:req.params.id})
+        .getOne()
 
+    if(!users) {
+        return res.status(400).send("no user");
+    }
+        
+    const id = users.id;
 
-    return res.status(200).send("myapge success");
+    const posts = await AppDataSource
+        .getRepository(post)
+        .createQueryBuilder()
+        .select()
+        .where("id = :user_id", {id:id})
+        .getMany()
+
+    const nfts = await AppDataSource
+        .getRepository(nft)
+        .createQueryBuilder()
+        .select()
+        .where("id = :user_id", {id:id})
+        .getMany()
+
+    return res.status(200).send({
+        user : users,
+        post : posts,
+        nft : nfts
+    });
 }
 
 async function send(req : Request, res:Response) {
