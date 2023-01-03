@@ -17,11 +17,11 @@ function SignUp() {
 
 
     async function submint(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        // axios.post("http://localhost:4000/signup",
-        //     {signUp}
-        // ).then((response) => {
-        //     console.log(response.data);
-        // })
+        axios.post("http://localhost:4000/users/signup",
+            {signUp}
+        ).then((response) => {
+            console.log(response.data);
+        })
         sessionStorage.setItem("user_id", signUp.nickname);
     }
 
