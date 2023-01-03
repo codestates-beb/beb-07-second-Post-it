@@ -18,12 +18,13 @@ function Login() {
 
     async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         await axios.post("http://localhost:4000/users/login",
-            login //param
+            login
         ).then((response) => {
             if(response.data){
                 // eslint-disable-next-line no-restricted-globals
                 location.href="/";
-                sessionStorage.setItem("user_id", login.nickname);
+                // console.log(response.data)
+                sessionStorage.setItem("user_id", response.data.id);
                 loginSet({nickname : "", password : ""});
             }
         })
