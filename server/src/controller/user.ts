@@ -94,7 +94,7 @@ async function mypage(req : Request, res:Response) {
         .getRepository(user)
         .createQueryBuilder()
         .select()
-        .where("address = :address", {address:req.params.address})
+        .where("id = :id", {id:req.params.id})
         .getOne()
 
     if(!users) {
@@ -107,14 +107,14 @@ async function mypage(req : Request, res:Response) {
         .getRepository(post)
         .createQueryBuilder()
         .select()
-        .where("id = :id", {id:id})
+        .where("id = :user_id", {id:id})
         .getMany()
 
     const nfts = await AppDataSource
         .getRepository(nft)
         .createQueryBuilder()
         .select()
-        .where("id = :id", {id:id})
+        .where("id = :user_id", {id:id})
         .getMany()
 
     return res.status(200).send({
