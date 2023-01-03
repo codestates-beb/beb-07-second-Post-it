@@ -30,8 +30,8 @@ function PostDetail() {
             Post조회 페이지 입니다.
             <h1>{post.title}</h1>
             <hr />
-            <p>Created At : {post.created_at}</p>
             <p>Creator : {post.nickname} Views : {post.views}</p>
+            <p>Created At : {post.created_at}</p>
             <p>{post.content}</p>
         </main>
     )
