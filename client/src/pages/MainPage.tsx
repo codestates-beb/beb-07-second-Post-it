@@ -7,7 +7,6 @@ import './MainPage.css';
 function MainPage() {
     
     const [pagination, setPagination] = useState(0);
-    const [posts, setPosts] = useState({});
 
 
     function Prev(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void {
