@@ -1,12 +1,16 @@
 import express, {Express} from 'express';
 import morgan from 'morgan';
 import AppDataSource from './db/data-source';
-
-const app : Express = express();
+import corsConfig from './config/corsConfig';
+import cors from "cors";
 
 import indexRouter from "./router/index";
 import userRouter from "./router/user";
 import postRouter from "./router/post";
+
+const app : Express = express();
+
+app.use(cors(corsConfig));
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));

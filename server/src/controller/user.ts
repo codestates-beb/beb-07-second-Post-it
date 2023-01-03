@@ -10,8 +10,6 @@ async function insert (req : Request, res: Response) {
         user_id : req.body.user_id,
         token_id : req.body.token_id,
         tx_hash : req.body.tx_hash
-
-
     }
 
     const userRepo = AppDataSource.getRepository(nft);
@@ -45,11 +43,23 @@ async function signup (req : Request, res: Response) {
     //지갑 생성하고(가나슈에서 값 받아오기)
     //그런다음 DB에 사용자의 정보 저장
 
-    // const address = web3.eth.personal.newAccount(req.body.password);
+    const info = {
+        nickname : nickname,
+        password : req.body.password,
+        address : "11111111",
+        token_amount : 1111111,
+        eth_amount : 22222222
+    }
 
-    return res.status(200).send(users);
+    const userRepo = AppDataSource.getRepository(user);
+    const userss = userRepo.create(info);
 
-
+    await userRepo
+    .save(userss)
+    .then((data) => {
+        res.json(data);
+    })
+    .catch((err) => console.log(err));
 }
 
 async function login (req : Request, res: Response) {
@@ -90,6 +100,11 @@ async function send(req : Request, res:Response) {
     if(!req.body.address || !req.body.token_amount) {
         return res.status(400).send(false);
     }
+    //아 여기 from, to도 보내주는건지
+    //아니면 web3같은걸로 내가 직접 해야하는지
+
+
+
     return res.status(200).send(true);
 }
 
