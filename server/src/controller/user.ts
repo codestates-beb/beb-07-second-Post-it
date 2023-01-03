@@ -8,12 +8,11 @@ import nft from "../entity/nft";
 async function insert (req : Request, res: Response) {
     const info = {
         user_id : req.body.user_id,
-        title : req.body.title,
-        content : req.body.content,
-        views : req.body.views
+        token_id : req.body.token_id,
+        tx_hash : req.body.tx_hash,
     }
 
-    const userRepo = AppDataSource.getRepository(post);
+    const userRepo = AppDataSource.getRepository(nft);
     const users = userRepo.create(info);
 
     await userRepo

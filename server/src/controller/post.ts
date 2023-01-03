@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import internal from "stream";
 import AppDataSource from "../db/data-source";
 import post from "../entity/post";
+import user from "../entity/user";
 
 async function postlist (req: Request, res: Response) {
 
@@ -21,17 +22,28 @@ async function postlist (req: Request, res: Response) {
         return res.status(400).send("No posts");
     }
     
+    const users = await AppDataSource
+        .getRepository(user)
+        .createQueryBuilder()
+        .select()
+        .getMany()
+
+
     const data = [];
     
     for(let i = 0; i<10;i++) {
-        const temp = {
-            id : posts[i].id,
-            title : posts[i].title,
-            nickname : posts[i].user_id,
-            created_at : posts[i].created_at,
-            views : posts[i].views
+        for(let j=0;j<users.length;j++) {
+            if(posts[i].user_id === users[j].id) {
+                const temp = {
+                    id : posts[i].id,
+                    title : posts[i].title,
+                    nickname : users[j].nickname,
+                    created_at : posts[i].created_at,
+                    views : posts[i].views
+                }
+                data.push(temp);
+            }
         }
-        data.push(temp);
     }
     return res.status(200).send(data);
 }
