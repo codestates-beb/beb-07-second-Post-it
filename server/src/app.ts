@@ -6,6 +6,7 @@ const app : Express = express();
 
 import indexRouter from "./router/index";
 import userRouter from "./router/user";
+import postRouter from "./router/post";
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
@@ -14,11 +15,12 @@ app.use(morgan("dev"));
 
 app.use('/', indexRouter);
 app.use('/users', userRouter);
+app.use('/post', postRouter);
 
 AppDataSource.initialize()
     .then(()=>{
-        console.log("db init success");
-        //AppDataSource.synchronize();
+       console.log("db init success");
+       //AppDataSource.synchronize();
     })
     .catch((error)=> console.log(error));
 

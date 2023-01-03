@@ -6,11 +6,13 @@ router.get("/", function (req : Request, res : Response) {
     return res.status(200).send("hello user")
 })
 
+router.post("/insert", userController.insert);
+
 router.post("/signup", userController.signup);
 
 router.post("/login", userController.login);
 
-router.get("/mypage/:user_id", userController.mypage);
+router.get("/mypage/:address", userController.mypage);
 
 router.post("/send", userController.send);
 
