@@ -106,14 +106,14 @@ async function mypage(req : Request, res:Response) {
         .getRepository(post)
         .createQueryBuilder()
         .select()
-        .where("id = :user_id", {id:id})
+        .where("user_id = :id", {id:id})
         .getMany()
 
     const nfts = await AppDataSource
         .getRepository(nft)
         .createQueryBuilder()
         .select()
-        .where("id = :user_id", {id:id})
+        .where("user_id = :id", {id:id})
         .getMany()
 
     return res.status(200).send({
@@ -135,10 +135,19 @@ async function send(req : Request, res:Response) {
     return res.status(200).send(true);
 }
 
+async function minting(req: Request, res:Response) {
+    if(!req) {
+        return res.status(400).send("minting error");
+    }
+    return res.status(200).send("minting success");
+}
+
+
 export default {
     insert,
     signup,
     login,
     mypage,
-    send
+    send,
+    minting
 }

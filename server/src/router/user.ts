@@ -16,4 +16,6 @@ router.get("/mypage/:id", userController.mypage);
 
 router.post("/send", userController.send);
 
+router.post("/minting", userController.minting);
+
 export default router;
