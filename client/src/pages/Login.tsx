@@ -16,12 +16,13 @@ function Login() {
         loginSet(login)
     }
 
-    async function submint(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        // axios.post("http://localhost:4000/login",
-        //     {login}
-        // ).then((response) => {
-        //     console.log(response.data);
-        // })
+    async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        console.log(login)
+        await axios.post("http://localhost:4000/users/login",
+            {login}
+        ).then((response) => {
+            console.log(response.data);
+        })
         sessionStorage.setItem("user_id", login.nickname);
 
     }
@@ -39,7 +40,7 @@ function Login() {
                         <h1>Login</h1>
                         <input placeholder='ID' onChange={e => IDChange(e)} />
                         <input placeholder='PW' type="password" onChange={e => PWChange(e)} />
-                        <button onClick={e => submint(e)}><b>Create</b></button>
+                        <button onClick={e => submit(e)}><b>Create</b></button>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <button onClick={e => moveSignUp(e)}><b>SignUp</b></button>
 
