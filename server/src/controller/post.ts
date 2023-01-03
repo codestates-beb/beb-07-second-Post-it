@@ -67,6 +67,11 @@ async function wpost (req: Request, res: Response) {
 }
 
 async function getpost (req: Request, res: Response) {
+    /**
+     * 
+     * 준석님 post 정보가 넘어올 때 유저의 아이디가 없습니다.
+     * 
+     *  */ 
 
     const posts = await AppDataSource
         .getRepository(post)
@@ -81,6 +86,7 @@ async function getpost (req: Request, res: Response) {
     return res.status(200).send({
         id: posts.id,
         title: posts.title,
+        content : posts.content,
         user_id: posts.user_id,
         created_at: posts.created_at,
         views: posts.views
