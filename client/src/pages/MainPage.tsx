@@ -2,18 +2,14 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import PostList from "./PostList";
 
+import './MainPage.css';
+
 function MainPage() {
     
     const [pagination, setPagination] = useState(0);
-    // const [nfts, setNfts] = useState({});
+    const [posts, setPosts] = useState({});
 
-    useEffect(() => {
-        console.log(pagination)
-        // axios.get("http://localhost:4000/post/postList?id=" + pagination)
-        // .then((response) => {
-        //     console.log(response.data)
-        // })
-      }, [pagination]);
+
     function Prev(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void {
         setPagination((pageNum) => {
             if (pageNum <= 0) {
@@ -32,7 +28,9 @@ function MainPage() {
 
     return (
         <main>
-            <PostList />
+            <a className='write__post' href='/post'>게시글 작성</a>
+            <hr />
+            <PostList pageNum={pagination}/>
             <p>
                 <a onClick={e => Prev(e)}>
                     <i>prev</i>
