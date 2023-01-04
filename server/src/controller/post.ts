@@ -12,40 +12,13 @@ async function postlist (req: Request, res: Response) {
     const id = req.query.id;
 
     const posts = await AppDataSource
-      .getRepository(post)
-      .createQueryBuilder()
-      .select()
-      .where("id >= :id*10+1 AND id <= :id*10+10", {id:id})
-      .getMany()
-
-    if(!posts) {
-        return res.status(400).send("No posts");
-    }
+        .query("SELECT post.*, user.nickname FROM post INNER JOIN user ON post.user_id=user.id WHERE post.id > ?*10;", [id]);
     
-    const users = await AppDataSource
-        .getRepository(user)
-        .createQueryBuilder()
-        .select()
-        .getMany()
-
-
-    const data = [];
     
-    for(let i = 0; i<10;i++) {
-        for(let j=0;j<users.length;j++) {
-            if(posts[i].user_id === users[j].id) {
-                const temp = {
-                    id : posts[i].id,
-                    title : posts[i].title,
-                    nickname : users[j].nickname,
-                    created_at : posts[i].created_at,
-                    views : posts[i].views
-                }
-                data.push(temp);
-            }
-        }
-    }
-    return res.status(200).send(data);
+
+
+
+    return res.status(200).send(posts);
 }
 
 async function wpost (req: Request, res: Response) {
