@@ -7,12 +7,23 @@ import nft from "../entity/nft";
 
 async function insert (req : Request, res: Response) {
     const info = {
-        user_id : req.body.user_id,
+/*         user_id : req.body.user_id,
         token_id : req.body.token_id,
-        tx_hash : req.body.tx_hash,
+        tx_hash : req.body.tx_hash, */
+
+        user_id : req.body.user_id,
+        title : req.body.title,
+        content : req.body.content,
+        views : req.body.views
+
+/*         nickname : req.body.nickname,
+        password : req.body.password,
+        address : req.body.address,
+        token_amount : req.body.token_amount,
+        eth_amount : req.body.eth_amount, */
     }
 
-    const userRepo = AppDataSource.getRepository(nft);
+    const userRepo = AppDataSource.getRepository(post);
     const users = userRepo.create(info);
 
     await userRepo
@@ -23,10 +34,48 @@ async function insert (req : Request, res: Response) {
         .catch((err) => console.log(err));
 }
 
+async function create_server () {
+    console.log("서버만들기 들어갑니다");
+    const accounts = await web3.eth.getAccounts();
+    const serverAddress = accounts[0];
+    const eth_amount = Number(web3.eth.getBalance(serverAddress));
+
+    const users = await AppDataSource
+        .getRepository(user)
+        .createQueryBuilder()
+        .select()
+        .where("address = :address", {address:serverAddress})
+        .getOne()
+
+    if(users) {
+        console.log("서버 지갑 이미 있습니다.");
+    }
+    else { //서버 지갑이 없으면 새로 insert해줘야함
+        const info = {
+            nickname : "server",
+            password : "secret", //그냥 password  OR  private_key
+            address : serverAddress,
+            token_amount : 1111111, //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
+            eth_amount : 222222, //eth양을 가져오는 함수
+        }
+        const userRepo = AppDataSource.getRepository(user);
+        const userss = userRepo.create(info);
+    
+        await userRepo
+        .save(userss)
+        .then((data) => {
+            console.log(data);
+        })
+        .catch((err) => console.log(err));
+        console.log("서버계정을 생성해주었습니다.!");
+    }
+}
+
 async function signup (req : Request, res: Response) {
     if(!req.body.nickname || !req.body.password) {
         return res.status(400).send("signup error");
     }
+    create_server();
     const nickname = req.body.nickname;
     
     const users = await AppDataSource
@@ -43,14 +92,15 @@ async function signup (req : Request, res: Response) {
     //지갑 생성하고(가나슈에서 값 받아오기)
     //그런다음 DB에 사용자의 정보 저장
 
-    const info = {
+    const address = String(web3.eth.personal.newAccount(req.body.password));
+    console.log(address);
+/*     const info = {
         nickname : nickname,
         password : req.body.password,
-        address : "11111111",
+        address : address,
         token_amount : 1111111,
         eth_amount : 22222222
     }
-
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
 
@@ -59,7 +109,7 @@ async function signup (req : Request, res: Response) {
     .then((data) => {
         res.json(data);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err)); */
 }
 
 async function login (req : Request, res: Response) {
@@ -85,7 +135,7 @@ async function login (req : Request, res: Response) {
 }
 
 async function mypage(req : Request, res:Response) {
-
+    
     if(!req) {
         return res.status(400).send("no request");
     }
@@ -145,6 +195,7 @@ async function minting(req: Request, res:Response) {
 
 export default {
     insert,
+    create_server,
     signup,
     login,
     mypage,
