@@ -34,48 +34,23 @@ async function insert (req : Request, res: Response) {
         .catch((err) => console.log(err));
 }
 
-async function create_server () {
-    console.log("서버만들기 들어갑니다");
-    const accounts = await web3.eth.getAccounts();
-    const serverAddress = accounts[0];
-    const eth_amount = Number(web3.eth.getBalance(serverAddress));
 
-    const users = await AppDataSource
-        .getRepository(user)
-        .createQueryBuilder()
-        .select()
-        .where("address = :address", {address:serverAddress})
-        .getOne()
 
-    if(users) {
-        console.log("서버 지갑 이미 있습니다.");
-    }
-    else { //서버 지갑이 없으면 새로 insert해줘야함
-        const info = {
-            nickname : "server",
-            password : "secret", //그냥 password  OR  private_key
-            address : serverAddress,
-            token_amount : 1111111, //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
-            eth_amount : 222222, //eth양을 가져오는 함수
-        }
-        const userRepo = AppDataSource.getRepository(user);
-        const userss = userRepo.create(info);
-    
-        await userRepo
-        .save(userss)
-        .then((data) => {
-            console.log(data);
-        })
-        .catch((err) => console.log(err));
-        console.log("서버계정을 생성해주었습니다.!");
-    }
+async function createWallet() {
+    /**
+     * 1. 지갑생성
+     * 2. 이더 지급 eth.tranfer()
+     * 3. 지급한 이더를 디비 저장
+     * 
+    */
 }
 
 async function signup (req : Request, res: Response) {
     if(!req.body.nickname || !req.body.password) {
         return res.status(400).send("signup error");
     }
-    create_server();
+    createWallet();
+    // create_server();
     const nickname = req.body.nickname;
     
     const users = await AppDataSource
@@ -177,6 +152,7 @@ async function send(req : Request, res:Response) {
     if(!req.body.address || !req.body.token_amount) {
         return res.status(400).send(false);
     }
+    // from: user_address, to: address, token_amount
     //아 여기 from, to도 보내주는건지
     //아니면 web3같은걸로 내가 직접 해야하는지
 
@@ -186,6 +162,7 @@ async function send(req : Request, res:Response) {
 }
 
 async function minting(req: Request, res:Response) {
+    console.log(req.body)
     if(!req) {
         return res.status(400).send("minting error");
     }
@@ -195,7 +172,7 @@ async function minting(req: Request, res:Response) {
 
 export default {
     insert,
-    create_server,
+    // create_server,
     signup,
     login,
     mypage,

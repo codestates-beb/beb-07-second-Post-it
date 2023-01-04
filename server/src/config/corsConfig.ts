@@ -1,4 +1,4 @@
 export default {
-    origin: ["http://localhost:8080"],
+    origin: ["http://localhost:8000"],
     credentials: true,
 }

@@ -8,7 +8,7 @@ import indexRouter from "./router/index";
 import userRouter from "./router/user";
 import postRouter from "./router/post";
 
-import userController from "./controller/user";
+import create_server from './init';
 
 const app : Express = express();
 
@@ -31,6 +31,6 @@ AppDataSource.initialize()
     .catch((error)=> console.log(error));
 
 app.listen(4000, ()=>{
-  // userController.create_server();
+  create_server()
   console.log(`Listening http://localhost:${4000}`);
 })
