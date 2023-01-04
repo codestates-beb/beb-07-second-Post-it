@@ -12,11 +12,8 @@ async function postlist (req: Request, res: Response) {
     const id = req.query.id;
 
     const posts = await AppDataSource
-        .query("SELECT post.*, user.nickname FROM post INNER JOIN user ON post.user_id=user.id WHERE post.id > ?*10;", [id]);
+        .query("SELECT post.*, user.nickname FROM post INNER JOIN user ON post.user_id=user.id WHERE post.id > ?*10 ORDER BY post.id LIMIT 10;", [id]);
     
-    
-
-
 
     return res.status(200).send(posts);
 }
@@ -42,9 +39,9 @@ async function wpost (req: Request, res: Response) {
 async function getpost (req: Request, res: Response) {
     /**
      * 
-     * 준석님 post 정보가 넘어올 때 유저의 아이디가 없습니다.
+     * 준석님 post 정보가 넘어올 때 유저의 닉네임이 없습니다.
      * 
-     *  */ 
+     *  */
 
     const posts = await AppDataSource
         .getRepository(post)
