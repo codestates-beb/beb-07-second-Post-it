@@ -11,6 +11,16 @@ interface PostType {
     views : number
 }
 
+// {
+//     "id": 1,
+//     "user_id": 1,
+//     "title": "title test",
+//     "content": "content test",
+//     "created_at": "2023-01-03T05:12:07.000Z",
+//     "views": 1,
+//     "nickname": "aaaa"
+// }
+
 function PostDetail() {
     const location = useLocation()
     const id = location.search.split("=")[1];
@@ -20,7 +30,7 @@ function PostDetail() {
     useEffect(() => {
         axios.get(`http://localhost:4000/post/getpost?id=${id}`)
         .then((response) => {
-            setPost(response.data)
+            setPost(response.data[0])
             console.log(response.data)
         })
     }, [])
