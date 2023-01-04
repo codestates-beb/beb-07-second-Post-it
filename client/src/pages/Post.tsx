@@ -16,17 +16,18 @@ function WritePost() {
     }
 
     async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        axios.post("http://localhost:4000/post/wpost", {
+        await axios.post("http://localhost:4000/post/wpost", {
             title : title,
-            content : content
+            content : content,
+            user_id : sessionStorage.getItem("user_id")
         })
         .then((response) => {
-            console.log(response.data)
+            
         })
+        // eslint-disable-next-line no-restricted-globals
+        location.href="/"
     }
 
-    console.log(title);
-    console.log(content);
 
     return (
         <main>

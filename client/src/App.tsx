@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Market from "./pages/Market";
 import SignUp from "./pages/SignUp";
 import Post from "./pages/Post";
+import PostDetail from "./pages/PostDetail";
 
 import Header from "./components/Header";
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/login" element={<Login /> } />
           <Route path="/signup" element={<SignUp /> } />
           <Route path='/post' element={<Post />} />
+          <Route path='/post/detail' element={<PostDetail />} />
         </Routes>
       </BrowserRouter>
 

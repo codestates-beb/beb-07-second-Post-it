@@ -33,6 +33,11 @@ async function wpost (req: Request, res: Response) {
 }
 
 async function getpost (req: Request, res: Response) {
+    /**
+     * 
+     * 준석님 post 정보가 넘어올 때 유저의 닉네임이 없습니다.
+     * 
+     *  */
 
     const id = Number(req.query.id);
 

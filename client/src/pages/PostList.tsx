@@ -1,5 +1,7 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import PostDetail from "./PostDetail";
 
 interface propsType {
         pageNum : number   
@@ -7,7 +9,7 @@ interface propsType {
 
 interface postListType {
         id : number,
-        nickname : number,
+        nickname : string,
         title : string,
         content : string,
         created_at : string,
@@ -32,13 +34,16 @@ function PostList({pageNum} : propsType) {
         <div>
             {
                 postList.map((item : postListType) => {
+                    
                     return (
                         <div>
-                            <p>{item.id}</p>
-                            <a><h3>{item.title}</h3></a>
+                            
+                            <a href={`/post/detail?id=${item.id}`}><h3>{item.title}</h3></a>        
                             <p>Creator: {item.nickname}</p>
                             <p>Created At : {item.created_at}</p>
                             <p>Views : {item.views}</p>
+                            <hr />
+                            
                         </div>
                         
                     )
