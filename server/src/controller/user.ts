@@ -4,6 +4,7 @@ import web3 from "../config/web3"
 import user from "../entity/user";
 import post from "../entity/post";
 import nft from "../entity/nft";
+require("dotenv").config()
 
 async function insert (req : Request, res: Response) {
     const info = {
@@ -50,36 +51,36 @@ async function signup (req : Request, res: Response) {
 
     if(users) {
         return res.status(400).send({
-            message:"중복된 값이 있음",
+            message:"중복된 계정이 있음",
             users
         });
     }
     
     const address = await web3.eth.personal.newAccount(String(req.body.password));
 
-    web3.eth.accounts.signTransaction({
-        to: "0xE8C05A8B2763103A33dD2274c375CB17060D7447",
-        value: '300000000000000000', //이만큼이 0.3이더
+    await web3.eth.accounts.signTransaction({
+        to: address,
+        value: '2000000000000000000', //2이더
         gas: 21000,
-    }, "private_key", function (err, result) {
+    }, process.env.SERVER_PRIVATE_KEY || "", function (err, result) {
         if(err) {
             console.log(err);
             return res.status(400).send("지갑생성 오류");
         }
         if(result.rawTransaction===undefined) {
-            console.log(`raw Transaction : ${result.rawTransaction}`);
             return res.status(400).send("result.rawTransaction이 없음");
         }
-        web3.eth.sendSignedTransaction(result.rawTransaction).on ('receipt', console.log);
+        web3.eth.sendSignedTransaction(result.rawTransaction);
     });
     
-    return res.status(200).send("개인지갑 생성도 완료");
-/*     const info = {
+    const eth_amount = await web3.eth.getBalance(address);
+
+    const info = {
         nickname : nickname,
         password : req.body.password,
         address : address,
-        token_amount : 1111111,
-        eth_amount : 0 //이더받아온만큼 
+        token_amount : "0",
+        eth_amount : String(eth_amount)
     }
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
@@ -87,9 +88,11 @@ async function signup (req : Request, res: Response) {
     await userRepo
     .save(userss)
     .then((data) => {
-        res.json(data);
+        return res.status(200).send(data);
     })
-    .catch((err) => console.log(err)); */
+    .catch((err) => {
+        return res.status(400).send(err)
+    });
 }
 
 async function login (req : Request, res: Response) {

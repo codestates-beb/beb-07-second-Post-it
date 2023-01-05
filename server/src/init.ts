@@ -6,7 +6,6 @@ async function create_server () {
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
     let eth_amount = await web3.eth.getBalance(serverAddress);
-    eth_amount = web3.utils.toWei('1', "gwei");
 
     const users = await AppDataSource
         .getRepository(user)
@@ -23,8 +22,8 @@ async function create_server () {
             nickname : "server",
             password : "secret",
             address : serverAddress,
-            token_amount : 1111111, //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
-            eth_amount : Number(eth_amount),
+            token_amount : "0", //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
+            eth_amount : String(eth_amount),
         }
 
         const userRepo = AppDataSource.getRepository(user);

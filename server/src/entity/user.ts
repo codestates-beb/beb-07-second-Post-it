@@ -15,10 +15,10 @@ export default class user{
     address : string
 
     @Column()
-    token_amount : number
+    token_amount : string
 
     @Column()
-    eth_amount : number
+    eth_amount : string
 
     @CreateDateColumn()
     created_at : Date

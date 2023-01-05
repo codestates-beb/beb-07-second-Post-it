@@ -26,7 +26,6 @@ app.use('/post', postRouter);
 app.listen(4000, ()=>{
   AppDataSource.initialize()
     .then(()=>{
-       console.log("db init success");
        AppDataSource.synchronize();
        create_server();
     })
