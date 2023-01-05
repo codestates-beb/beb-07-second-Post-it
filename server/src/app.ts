@@ -23,14 +23,14 @@ app.use('/', indexRouter);
 app.use('/users', userRouter);
 app.use('/post', postRouter);
 
-AppDataSource.initialize()
+app.listen(4000, ()=>{
+  AppDataSource.initialize()
     .then(()=>{
        console.log("db init success");
-      //  AppDataSource.synchronize();
+       AppDataSource.synchronize();
+       create_server();
     })
     .catch((error)=> console.log(error));
 
-app.listen(4000, ()=>{
-  create_server()
   console.log(`Listening http://localhost:${4000}`);
 })

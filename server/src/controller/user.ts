@@ -34,23 +34,11 @@ async function insert (req : Request, res: Response) {
         .catch((err) => console.log(err));
 }
 
-
-
-async function createWallet() {
-    /**
-     * 1. 지갑생성
-     * 2. 이더 지급 eth.tranfer()
-     * 3. 지급한 이더를 디비 저장
-     * 
-    */
-}
-
 async function signup (req : Request, res: Response) {
     if(!req.body.nickname || !req.body.password) {
         return res.status(400).send("signup error");
     }
-    createWallet();
-    // create_server();
+
     const nickname = req.body.nickname;
     
     const users = await AppDataSource
@@ -60,21 +48,38 @@ async function signup (req : Request, res: Response) {
         .where("nickname = :nickname", {nickname:nickname})
         .getOne()
 
-    if(users) { //중복된 값있을때
-        return res.status(400).send(users);
+    if(users) {
+        return res.status(400).send({
+            message:"중복된 값이 있음",
+            users
+        });
     }
-    //중복된 값이 없을때
-    //지갑 생성하고(가나슈에서 값 받아오기)
-    //그런다음 DB에 사용자의 정보 저장
+    
+    const address = await web3.eth.personal.newAccount(String(req.body.password));
 
-    const address = String(web3.eth.personal.newAccount(req.body.password));
-    console.log(address);
+    web3.eth.accounts.signTransaction({
+        to: "0xE8C05A8B2763103A33dD2274c375CB17060D7447",
+        value: '300000000000000000', //이만큼이 0.3이더
+        gas: 21000,
+    }, "private_key", function (err, result) {
+        if(err) {
+            console.log(err);
+            return res.status(400).send("지갑생성 오류");
+        }
+        if(result.rawTransaction===undefined) {
+            console.log(`raw Transaction : ${result.rawTransaction}`);
+            return res.status(400).send("result.rawTransaction이 없음");
+        }
+        web3.eth.sendSignedTransaction(result.rawTransaction).on ('receipt', console.log);
+    });
+    
+    return res.status(200).send("개인지갑 생성도 완료");
 /*     const info = {
         nickname : nickname,
         password : req.body.password,
         address : address,
         token_amount : 1111111,
-        eth_amount : 22222222
+        eth_amount : 0 //이더받아온만큼 
     }
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
@@ -172,7 +177,6 @@ async function minting(req: Request, res:Response) {
 
 export default {
     insert,
-    // create_server,
     signup,
     login,
     mypage,
