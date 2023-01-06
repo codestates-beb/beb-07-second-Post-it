@@ -35,13 +35,16 @@ async function wpost (req: Request, res: Response) {
 }
 
 async function getpost (req: Request, res: Response) {
-    /**
-     * 
-     * 준석님 post 정보가 넘어올 때 유저의 닉네임이 없습니다.
-     * 
-     *  */
+    const id = Number(req.query.id); //post table의 아이디
 
-    const id = Number(req.query.id);
+    const userRepo = AppDataSource.getRepository(post);
+
+    await userRepo
+        .createQueryBuilder()
+        .update(post)
+        .set({views: ()=> "views+1"})
+        .where("id = :id", {id:id})
+        .execute()
 
     const posts = await AppDataSource
     .query("SELECT post.*, user.nickname FROM post INNER JOIN user ON post.user_id=user.id WHERE post.id=?;", [id])
