@@ -9,6 +9,9 @@ function MyPage() {
     const [NFTList, setNFTList] = useState([])
     const [isSet, setIsSet] = useState(true)
 
+    const [toAddress, setToAddress] = useState("")
+    const [toAmount, setToAmount] = useState("")
+
 
     useEffect(() => {
         axios.get(`http://localhost:4000/users/mypage/${sessionStorage.getItem("user_id")}`)
@@ -28,13 +31,37 @@ function MyPage() {
         setIsSet(false)
     }
 
+    function ChangeAddress(e: React.ChangeEvent<HTMLInputElement>) {
+        setToAddress(e.target.value)
+    }
+
+    function ChangeAmount(e: React.ChangeEvent<HTMLInputElement>) {
+        setToAmount(e.target.value)
+    }
+
+    async function submitAmount() {
+        axios.post("http://localhost:4000/users/send", 
+        {
+            to_address : toAddress,
+            token_amount : toAmount,
+            from_address : user.address
+        })
+    }
+
     return(
         <main>
             <h2>{user.nickname}</h2>
             <hr />
             <p>Address : {user.address}</p>
             <p>ETH : {user.eth_amount}</p>
-            <p>TOKEN : {user.token_amount}</p>
+            <p>TOKEN : {user.token_amount}
+            </p>
+
+            <div>
+                <input placeholder='to address' onChange={e => ChangeAddress(e)} />
+                <input placeholder='amount' onChange={e => ChangeAmount(e)}/>
+                <button onClick={submitAmount}>Send</button>
+            </div>
             
             <nav className='mypage_nav'>
                 <ul>
