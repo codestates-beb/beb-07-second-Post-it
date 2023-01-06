@@ -4,6 +4,8 @@ import web3 from "../config/web3"
 import user from "../entity/user";
 import post from "../entity/post";
 import nft from "../entity/nft";
+import erc20invoke from "../web3invoke/invoke";
+import { getServers } from "dns";
 require("dotenv").config()
 
 async function insert (req : Request, res: Response) {
@@ -157,13 +159,17 @@ async function mypage(req : Request, res:Response) {
 }
 
 async function send(req : Request, res:Response) {
-    if(!req.body.address || !req.body.token_amount) {
+    /* if(!req.body.address || !req.body.token_amount) {
         return res.status(400).send(false);
-    }
+    } */
     // from: user_address, to: address, token_amount
     //아 여기 from, to도 보내주는건지
     //아니면 web3같은걸로 내가 직접 해야하는지
+    const serverAddress = await erc20invoke.getServerAddress();
 
+    /* const serverbal = await erc20invoke.BalanceOf(serverAddress); */
+    // console.log((await erc20invoke.Obj).methods.balanceOf(serverAddress));
+    console.log(serverAddress);
 
 
     return res.status(200).send(true);

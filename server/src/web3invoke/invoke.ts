@@ -2,12 +2,13 @@ import { Contract } from "web3-eth-contract";
 import web3 from "../config/web3";
 import bytecode from "../erc20byte";
 
-const abi721 = require("./erc20abi.json");
+const abi20 = require("./erc20abi.json");
 let contract: Contract;
 
 async function Deploy() {
+    console.log("배포 시작")
     const serverAddress = await getServerAddress();
-    contract = await new web3.eth.Contract(abi721).deploy(bytecode).send({
+    contract = await new web3.eth.Contract(abi20).deploy(bytecode).send({
         from: serverAddress, 
         gas: 4700000
     })
@@ -20,31 +21,30 @@ async function getServerAddress() {
 }
 
 async function getContractAddress() {
+    console.log("컨트랙트 주소 뽑기")
     const contractAddress = contract.options.address;
-    const testContract = new web3.eth.Contract(abi721, contractAddress);
+    return contractAddress
+}
+
+async function getContractObj() {
+    const contractAddress = await getContractAddress();
+    const testContract = new web3.eth.Contract(abi20, contractAddress);
     return testContract;
 }
 
 async function BalanceOf(address : string) {
     const contractAddress = await getContractAddress()
-    let erc20amount = await contractAddress.methods.balanceOf(address).call();
+    let erc20amount = await contract.methods.balanceOf(address).call();
     return erc20amount;
 }
 
-async function makeTx(to :string, from : string) {
-    // const info = {
-    //     nickname : "server",
-    //     password : "secret",
-    //     address : serverAddress,
-    //     token_amount : "0", //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
-    //     eth_amount : String(eth_amount),
-    // };
-    // return info;
-}
+// const Obj = getContractObj();
 
 export default {
     getServerAddress,
     getContractAddress,
     BalanceOf,
-    Deploy
+    Deploy,
+    getContractObj,
+    // Obj
 }

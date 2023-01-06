@@ -3,6 +3,7 @@ import AppDataSource from "./db/data-source";
 import user from "./entity/user";
 import erc20byte from "./erc20byte";
 import erc721byte from "./erc721byte";
+import erc20invoke from "./web3invoke/invoke";
 
 async function create_server () {
     const accounts = await web3.eth.getAccounts();
@@ -23,8 +24,10 @@ async function create_server () {
         /* console.log(bytecode); */
     }
     else {
-
-        var erc721Deploy = new web3.eth.Contract(abi721).deploy(erc721byte).send({
+        const serveraddress = await erc20invoke.getServerAddress();
+        await erc20invoke.Deploy();
+        const getserbal = await erc20invoke.BalanceOf(serveraddress);
+        /* var erc721Deploy = new web3.eth.Contract(abi721).deploy(erc721byte).send({
             from: serverAddress,
             gas: 4700000
         })
@@ -43,13 +46,13 @@ async function create_server () {
 
         // 컨트랙트 메소드 호출
         let erc20amount = await erc20Contract.methods.balanceOf(serverAddress).call();
-
+ */
         // 트랜잭션 생성
         const info = {
             nickname : "server",
             password : "secret",
-            address : serverAddress,
-            token_amount : "0", //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
+            address : serveraddress,
+            token_amount : getserbal, //서버계정으로 token배포하고 배포한 토큰수만큼 가져오기
             eth_amount : String(eth_amount),
         }
 
@@ -61,8 +64,6 @@ async function create_server () {
         .save(userss)
         .then((data) => {
             console.log("서버계정을 생성해주었습니다.!");
-            console.log(erc721contArr)
-            console.log(erc20contArr)
         })
         .catch((err) => console.log(err));
     }
