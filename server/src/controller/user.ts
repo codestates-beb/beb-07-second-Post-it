@@ -167,8 +167,9 @@ async function send(req : Request, res:Response) {
     //아니면 web3같은걸로 내가 직접 해야하는지
     const serverAddress = await erc20invoke.getServerAddress();
 
-    /* const serverbal = await erc20invoke.BalanceOf(serverAddress); */
+    const serverbal = await erc20invoke.BalanceOf(serverAddress);
     // console.log((await erc20invoke.Obj).methods.balanceOf(serverAddress));
+    console.log(serverbal)
     console.log(serverAddress);
 
 

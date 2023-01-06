@@ -4,6 +4,7 @@ import bytecode from "../erc20byte";
 
 const abi20 = require("./erc20abi.json");
 let contract: Contract;
+let contract_address = process.env.CONTRACT_ADDRESS
 
 async function Deploy() {
     console.log("배포 시작")
@@ -12,6 +13,10 @@ async function Deploy() {
         from: serverAddress, 
         gas: 4700000
     })
+}
+
+async function existsContract() {
+    contract = new web3.eth.Contract(abi20, contract_address);
 }
 
 async function getServerAddress() {
@@ -23,7 +28,7 @@ async function getServerAddress() {
 async function getContractAddress() {
     console.log("컨트랙트 주소 뽑기")
     const contractAddress = contract.options.address;
-    return contractAddress
+    return contractAddress;
 }
 
 async function getContractObj() {
@@ -33,7 +38,9 @@ async function getContractObj() {
 }
 
 async function BalanceOf(address : string) {
-    const contractAddress = await getContractAddress()
+    if (contract == undefined) {
+        await existsContract();
+    }
     let erc20amount = await contract.methods.balanceOf(address).call();
     return erc20amount;
 }
