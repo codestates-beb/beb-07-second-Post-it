@@ -21,15 +21,21 @@ async function create_server () {
         /* console.log(bytecode); */
     }
     else {
+        
+        // 컨트랙트 배포
         var test = new web3.eth.Contract(abi721).deploy(bytecode).send({
             from: serverAddress, 
             gas: 4700000
         })
 
+        // 컨트랙트 주소가져오기
         const contractAddress = (await test).options.address;
         const testContract = new web3.eth.Contract(abi721, contractAddress);
+
+        // 컨트랙트 메소드 호출
         let erc20amount = await testContract.methods.balanceOf(serverAddress).call();
 
+        // 트랜잭션 생성
         const info = {
             nickname : "server",
             password : "secret",
@@ -38,6 +44,7 @@ async function create_server () {
             eth_amount : String(eth_amount),
         }
 
+        // 디비에 저장
         const userRepo = AppDataSource.getRepository(user);
         const userss = userRepo.create(info);
     

@@ -29,6 +29,8 @@ async function wpost (req: Request, res: Response) {
         ])
         .execute()
     
+    // erc20 토큰 발행 로직 만들어주세요
+    
     return res.status(200).send(true);
 }
 
