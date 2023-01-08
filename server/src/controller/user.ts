@@ -4,8 +4,7 @@ import web3 from "../config/web3"
 import user from "../entity/user";
 import post from "../entity/post";
 import nft from "../entity/nft";
-import erc20invoke from "../web3invoke/invoke";
-import { getServers } from "dns";
+const abi20 = require("../erc20abi.json");
 require("dotenv").config()
 
 async function insert (req : Request, res: Response) {
@@ -81,7 +80,7 @@ async function signup (req : Request, res: Response) {
         nickname : nickname,
         password : req.body.password,
         address : address,
-        token_amount : "0",
+        token_amount : 0,
         eth_amount : String(eth_amount)
     }
     const userRepo = AppDataSource.getRepository(user);
@@ -159,19 +158,38 @@ async function mypage(req : Request, res:Response) {
 }
 
 async function send(req : Request, res:Response) {
-    /* if(!req.body.address || !req.body.token_amount) {
+    //이거 transfer되는건 내가 txt파일에 저장해뒀음ㄴ
+    if(!req.body.to_address || !req.body.from_address || !req.body.token_amount) {
         return res.status(400).send(false);
-    } */
-    // from: user_address, to: address, token_amount
-    //아 여기 from, to도 보내주는건지
-    //아니면 web3같은걸로 내가 직접 해야하는지
-    const serverAddress = await erc20invoke.getServerAddress();
+    }
+    const contract = new web3.eth.Contract(abi20, process.env.CONTRACT_ADDRESS);
 
-    const serverbal = await erc20invoke.BalanceOf(serverAddress);
-    // console.log((await erc20invoke.Obj).methods.balanceOf(serverAddress));
-    console.log(serverbal)
-    console.log(serverAddress);
+    const from = req.body.from_address;
+    const to = req.body.to_address;
+    const amount = req.body.token_amount;
 
+    // await web3.eth.personal.unlockAccount(from, "password", 1000);
+    // await web3.eth.personal.unlockAccount(to, "passwordd", 1000);
+    await contract.methods.transfer(to,amount).send({from});
+
+    const to_token = await contract.methods.balanceOf(to).call();
+    const from_token = await contract.methods.balanceOf(from).call();
+
+    const userRepo = AppDataSource.getRepository(user);
+
+    await userRepo
+        .createQueryBuilder()
+        .update(user)
+        .set({token_amount: () => `${from_token}`})
+        .where("address = :address", {address:from})
+        .execute()
+
+        await userRepo
+        .createQueryBuilder()
+        .update(user)
+        .set({token_amount: () => `${to_token}`})
+        .where("address = :address", {address:to})
+        .execute()
 
     return res.status(200).send(true);
 }
@@ -193,3 +211,10 @@ export default {
     send,
     minting
 }
+
+
+/*  send부분   
+    const serverAddress = await erc20invoke.getServerAddress();
+    const serverbal = await erc20invoke.BalanceOf(serverAddress);
+    console.log(serverbal)
+    console.log(serverAddress); */

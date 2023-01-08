@@ -1,0 +1,11 @@
+{
+    "apps" : [
+        {
+            "name" : "Web server",
+            "cwd" : "src",
+            "script" : "ts-node app.ts",
+            "watch" : false,
+            "autorestart" : false
+        }
+    ]
+}

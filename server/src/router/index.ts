@@ -1,4 +1,4 @@
-import express, {Request, Response, Router}  from "express";
+import express, {Router}  from "express";
 const router : Router = express.Router();
 
 router.get("/", function(req,res) {

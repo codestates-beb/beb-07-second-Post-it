@@ -1,8 +1,9 @@
 import { Contract } from "web3-eth-contract";
 import web3 from "../config/web3";
 import bytecode from "../erc20byte";
-
+require("dotenv").config();
 const abi20 = require("./erc20abi.json");
+
 let contract: Contract;
 let contract_address = process.env.CONTRACT_ADDRESS
 
@@ -45,7 +46,14 @@ async function BalanceOf(address : string) {
     return erc20amount;
 }
 
-// const Obj = getContractObj();
+async function gettransferFrom(from_address : string, to_address : string, token_amount : number){
+    if(contract == undefined) {
+        await existsContract();
+    }
+    await contract.methods.transfer(to_address, token_amount).call();
+    console.log("여기까지오긴옴?");
+    return 12;
+}
 
 export default {
     getServerAddress,
@@ -53,5 +61,5 @@ export default {
     BalanceOf,
     Deploy,
     getContractObj,
-    // Obj
+    gettransferFrom,
 }

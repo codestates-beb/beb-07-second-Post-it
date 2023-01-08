@@ -15,7 +15,7 @@ export default class user{
     address : string
 
     @Column()
-    token_amount : string
+    token_amount : number
 
     @Column()
     eth_amount : string
