@@ -158,7 +158,6 @@ async function mypage(req : Request, res:Response) {
 }
 
 async function send(req : Request, res:Response) {
-    //이거 transfer되는건 내가 txt파일에 저장해뒀음ㄴ
     if(!req.body.to_address || !req.body.from_address || !req.body.token_amount) {
         return res.status(400).send(false);
     }

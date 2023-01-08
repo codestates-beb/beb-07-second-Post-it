@@ -71,7 +71,7 @@ async function wpost (req: Request, res: Response) {
         .where("address = :address", {address:to})
         .execute()
 
-    return res.status(200).send(users[0].address);
+    return res.status(200).send(true);
 }
 
 async function getpost (req: Request, res: Response) {
