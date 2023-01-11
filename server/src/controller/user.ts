@@ -42,6 +42,9 @@ async function signup (req : Request, res: Response) {
         return res.status(400).send("signup error");
     }
 
+    const accounts = await web3.eth.getAccounts();
+    const serverAddress = accounts[0];
+
     const nickname = req.body.nickname;
     
     const users = await AppDataSource
@@ -87,10 +90,12 @@ async function signup (req : Request, res: Response) {
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
 
+    const eth_amount2 = await web3.eth.getBalance(serverAddress);
+
     await userRepo
     .createQueryBuilder()
     .update(user)
-    .set({eth_amount: ()=> "eth_amount-1000000000000000000"})
+    .set({eth_amount: ()=> eth_amount2})
     .where("id = :id", {id:1})
     .execute()
 
