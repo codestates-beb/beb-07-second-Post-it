@@ -11,7 +11,7 @@ function Mint() {
     }
 
     async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        await axios.post("http://localhost:4000/users/minting", {uri:uri});
+        await axios.post("http://localhost:4000/users/minting", {uri : uri, user_id : sessionStorage.getItem("user_id")});
         console.log("click submit button")
     }
     return (
