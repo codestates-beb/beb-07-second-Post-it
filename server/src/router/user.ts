@@ -16,6 +16,8 @@ router.get("/mypage/:id", userController.mypage);
 
 router.post("/send", userController.send);
 
-router.post("/minting", userController.minting);
+router.post("/minting", userController.minting); //nft등록
+
+router.post("/buy_sell", userController.buy_sell); //nft등록
 
 export default router;

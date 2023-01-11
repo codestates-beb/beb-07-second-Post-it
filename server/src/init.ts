@@ -4,6 +4,7 @@ import user from "./entity/user";
 import erc20byte from "./erc20byte";
 import erc721byte from "./erc721byte";
 const abi20 = require("./erc20abi.json");
+const abi721 = require("./erc721abi.json");
 require("dotenv").config()
 
 async function create_server () {
@@ -22,6 +23,13 @@ async function create_server () {
         console.log("서버 지갑 이미 있습니다.");
     }
     else {
+        let erc721Deploy = new web3.eth.Contract(abi721).deploy(erc721byte).send({
+            from: serverAddress,
+            gas: 4700000
+        })
+        const erc721contArr = (await erc721Deploy).options.address;
+        // const erc721Contract = new web3.eth.Contract(abi721, erc721contArr);
+
         let erc20Deploy = new web3.eth.Contract(abi20).deploy(erc20byte).send({
             from: serverAddress, 
             gas: 4700000
@@ -53,9 +61,3 @@ async function create_server () {
     }
 }
 export default create_server;
-/*          let erc721Deploy = new web3.eth.Contract(abi721).deploy(erc721byte).send({
-            from: serverAddress,
-            gas: 4700000
-        })
-        const erc721contArr = (await erc721Deploy).options.address;
-        const erc721Contract = new web3.eth.Contract(abi721, erc721contArr); */

@@ -28,8 +28,9 @@ async function wpost (req: Request, res: Response) {
     const content = req.body.content;
     const reward_amount = 100000;
 
-    const contract = new web3.eth.Contract(abi20, process.env.CONTRACT_ADDRESS);
+    const contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
     const accounts = await web3.eth.getAccounts();
+    const totalSupply = await contract.methods.totalSupply().call();
 
     const posts = await AppDataSource
         .getRepository(post)

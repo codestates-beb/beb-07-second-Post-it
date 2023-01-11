@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const models = require("./models");
 const Web3 = require("web3");
-const web3 = new Web3('HTTP://127.0.0.1:7545');
+const web3 = new Web3('http://127.0.0.1:7545');
 
 // 노드의 최신블록넘버 조회
 const getLatestBlock = async () => {
@@ -21,7 +21,7 @@ const task = cron.schedule(
 	async () => {
 		// 주기적으로 실행하고자 하는 함수
 		// 예시
-		// getLatestBlock()
+		getLatestBlock()
 	},
 	{
 		scheduled: false,

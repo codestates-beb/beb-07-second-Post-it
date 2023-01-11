@@ -9,7 +9,7 @@ export default class nft{
     user_id : number
 
     @Column()
-    token_id : number
+    URI : string
 
     @Column()
     tx_hash : string
