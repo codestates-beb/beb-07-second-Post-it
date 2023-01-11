@@ -14,11 +14,11 @@ contract TESTNft is ERC721URIStorage, Ownable {
     uint256 nftPrice;
 
     constructor() ERC721("MyNFTs", "MNFT") {
-        nftPrice = 100e18;
+        nftPrice = 10000;
     }
 
     function mintNFT(address recipient, string memory tokenURI) public onlyOwner returns (uint256) {
-        require(token.balanceOf(recipient) > nftPrice);
+        require(token.balanceOf(recipient) >= nftPrice);
 
         token.transferFrom(recipient, msg.sender, nftPrice);
         
