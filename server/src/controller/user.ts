@@ -61,7 +61,7 @@ async function signup (req : Request, res: Response) {
 
     await web3.eth.accounts.signTransaction({
         to: address,
-        value: '1000000000000000000', //2이더
+        value: '1000000000000000000', //1이더
         gas: 21000,
     }, process.env.SERVER_PRIVATE_KEY || "", function (err, result) {
         if(err) {
@@ -73,7 +73,7 @@ async function signup (req : Request, res: Response) {
         }
         web3.eth.sendSignedTransaction(result.rawTransaction);
     });
-    
+
     const eth_amount = await web3.eth.getBalance(address);
 
     const info = {
@@ -85,6 +85,14 @@ async function signup (req : Request, res: Response) {
     }
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
+
+    await userRepo
+    .createQueryBuilder()
+    .update(user)
+    .set({eth_amount: ()=> "eth_amount-1000000000000000000"})
+    .where("id = :id", {id:1})
+    .execute()
+
 
     await userRepo
     .save(userss)
@@ -167,6 +175,17 @@ async function send(req : Request, res:Response) {
     const to = req.body.to_address;
     const amount = req.body.token_amount;
 
+    const userFrom = await AppDataSource
+        .getRepository(user)
+        .createQueryBuilder()
+        .select()
+        .where("address = :address", {address:from})
+        .getOne()
+
+    if(!userFrom) return res.status(400).send("no userFrom");
+
+    await web3.eth.personal.unlockAccount(from,userFrom.password, 600);
+
     await contract.methods.transfer(to,amount).send({from});
 
     const to_token = await contract.methods.balanceOf(to).call();
@@ -196,9 +215,18 @@ async function minting(req: Request, res:Response) {
         return res.status(400).send("minting error");
     }
 
+    //유저가 컨트랙트에게 approve를 해준다
+    //그리고 setToken을 해주고
+    //아래꺼 그대로 민팅
+
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
     const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
+    const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
+
+
+
+
 
     const data = erc721Contract.methods.mintNFT(serverAddress, req.body.uri).encodeABI();
     const tx = {
@@ -233,6 +261,8 @@ async function buy_sell(req: Request, res:Response) {
         return res.status(400).send("buy_sell error");
     }
     
+    
+
 /*     const users = await AppDataSource
         .getRepository(user)
         .createQueryBuilder()
