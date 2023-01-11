@@ -231,6 +231,8 @@ async function minting(req: Request, res:Response) {
         return res.status(400).send("minting error");
     }
 
+    console.log(req.body.uri)
+
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
     const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
@@ -245,9 +247,12 @@ async function minting(req: Request, res:Response) {
 
     if(!userss) return res.status(400).send("no userss");
 
-    await erc20Contract.methods.approve(process.env.CONTRACT721_ADDRESS, 10000);
+    await web3.eth.personal.unlockAccount(userss.address,userss.password, 600)
+
+    await erc20Contract.methods.approve(process.env.CONTRACT721_ADDRESS, 10000).send({from:userss.address})
 
     const data = erc721Contract.methods.mintNFT(userss.address, req.body.uri).encodeABI();
+
     const tx = {
         from: serverAddress,
         to: process.env.CONTRACT721_ADDRESS,
@@ -256,23 +261,30 @@ async function minting(req: Request, res:Response) {
     };
     const signPromise = await web3.eth.accounts.signTransaction(tx, String(process.env.SERVER_PRIVATE_KEY));
     if(!signPromise.rawTransaction) return res.status(400).send("signpromise error");
+    console.log("here")
     const signedTx = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
+    console.log(signedTx)
 
-    const info = {
-        user_id : req.body.user_id,
-        URI : req.body.uri,
-        tx_hash : signedTx.transactionHash
-    }
+    // const t = await erc721Contract.methods.mintNFT(userss.address, req.body.uri).send({from: serverAddress, gas : 50000})
+    
+    // console.log(t)
+    // const info = {
+    //     user_id : req.body.user_id,
+    //     URI : req.body.uri,
+    //     tx_hash : signedTx.transactionHash
+    // }
 
-    const userRepo = AppDataSource.getRepository(nft);
-    const users = userRepo.create(info);
+    // const userRepo = AppDataSource.getRepository(nft)
+    // const users = userRepo.create(info);
 
-    await userRepo
-        .save(users)
-        .then((data) => {
-            res.status(200).send(true);
-        })
-        .catch((err) => console.log(err));
+    // await userRepo
+    //     .save(users)
+    //     .then((data) => {
+    //         res.status(200).send(true);
+    //     })
+    //     .catch((err) => console.log(err));
+
+    return res.send("success").end()
 }
 
 async function buy_sell(req: Request, res:Response) {

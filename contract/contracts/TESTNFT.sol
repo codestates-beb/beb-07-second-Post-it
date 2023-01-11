@@ -12,6 +12,7 @@ contract TESTNft is ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIds;
     IERC20 token;
     uint256 nftPrice;
+    mapping(string => uint256) mappingID;
 
     constructor() ERC721("MyNFTs", "MNFT") {
         nftPrice = 10000;
@@ -27,6 +28,8 @@ contract TESTNft is ERC721URIStorage, Ownable {
         _mint(recipient, newItemId);
         _setTokenURI(newItemId, tokenURI);
 
+        mappingID[tokenURI]= newItemId;
+
         return newItemId;
     }
 
@@ -34,5 +37,9 @@ contract TESTNft is ERC721URIStorage, Ownable {
         require(tokenAddress != address(0x0));
         token = IERC20(tokenAddress);
         return true;
+    }
+
+    function getTokenId(string memory tokenURI) public view returns (uint256) {
+        return mappingID[tokenURI];
     }
 }

@@ -31,7 +31,7 @@ async function create_server () {
 
 
         process.env.CONTRACT20_ADDRESS = erc20Deploy.options.address;
-        console.log(process.env.CONTRACT20_ADDRESS)
+        console.log("erc20 ::" + process.env.CONTRACT20_ADDRESS)
         
 
         const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
@@ -52,7 +52,7 @@ async function create_server () {
         })
         
         process.env.CONTRACT721_ADDRESS = erc721Deploy.options.address;
-        console.log(process.env.CONTRACT721_ADDRESS)
+        console.log("erc271 :: " + process.env.CONTRACT721_ADDRESS)
         const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
 
         const data = erc721Contract.methods.setToken(process.env.CONTRACT721_ADDRESS).encodeABI();
