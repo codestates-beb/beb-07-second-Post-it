@@ -4,6 +4,7 @@ import web3 from "../config/web3"
 import user from "../entity/user";
 import post from "../entity/post";
 import nft from "../entity/nft";
+import { updateSpreadAssignment } from "typescript";
 const abi20 = require("../erc20abi.json");
 const abi721 = require("../erc721abi.json");
 require("dotenv").config()
@@ -215,20 +216,23 @@ async function minting(req: Request, res:Response) {
         return res.status(400).send("minting error");
     }
 
-    //유저가 컨트랙트에게 approve를 해준다
-    //그리고 setToken을 해주고
-    //아래꺼 그대로 민팅
-
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
     const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
     const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
 
+    const userss = await AppDataSource
+        .getRepository(user)
+        .createQueryBuilder()
+        .select()
+        .where("id = :id", {id:req.body.user_id})
+        .getOne()
 
+    if(!userss) return res.status(400).send("no userss");
 
+    await erc20Contract.methods.approve(process.env.CONTRACT721_ADDRESS, 10000);
 
-
-    const data = erc721Contract.methods.mintNFT(serverAddress, req.body.uri).encodeABI();
+    const data = erc721Contract.methods.mintNFT(userss.address, req.body.uri).encodeABI();
     const tx = {
         from: serverAddress,
         to: process.env.CONTRACT721_ADDRESS,
@@ -261,7 +265,9 @@ async function buy_sell(req: Request, res:Response) {
         return res.status(400).send("buy_sell error");
     }
     
-    
+    //구매
+    //721 transferFrom
+    //20 transfer
 
 /*     const users = await AppDataSource
         .getRepository(user)
@@ -275,9 +281,9 @@ async function buy_sell(req: Request, res:Response) {
     const address = users.address;
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
-    const amount = 20000;
+    const amount = 10000;
 
-    await web3.eth.personal.unlockAccount(address,"passwordd", 600)
+    await web3.eth.personal.unlockAccount(address,users.password, 600)
 
     const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
     const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
@@ -291,12 +297,19 @@ async function buy_sell(req: Request, res:Response) {
 
     if(!nfts) return res.status(400).send("wrong nft uri");
 
-    const ownerr = await erc721Contract.methods.ownerOf(1).call();
+    const ownerr = await erc721Contract.methods.ownerOf(nfts.id).call();
     console.log(ownerr);
+    
+    const userss = await AppDataSource
+    .getRepository(user)
+    .createQueryBuilder()
+    .select()
+    .where("address = :address", {address:ownerr})
+    .getOne()
 
     const approve = erc721Contract.methods.setApprovalForAll(address, nfts.id).call();
 
-    const data = erc721Contract.methods.transferFrom(serverAddress, address, nfts.id).encodeABI();
+    const data = erc721Contract.methods.safeTransferFrom(serverAddress, address, nfts.id).encodeABI();
     const tx = {
         from: serverAddress,
         to: process.env.CONTRACT721_ADDRESS,
@@ -307,7 +320,6 @@ async function buy_sell(req: Request, res:Response) {
     if(!signPromise.rawTransaction) return res.status(400).send("signpromise error");
     const signedTx = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
 
-    //이거 근데 creator한테 줘야함. 아 이거떄문에 creator가 필요한거임! 이거 수정해야함
     await erc20Contract.methods.transfer(serverAddress, amount).send({from:address});
 
     const a = await erc721Contract.methods.balanceOf(serverAddress).call();
