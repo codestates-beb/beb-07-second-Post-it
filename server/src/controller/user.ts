@@ -87,6 +87,16 @@ async function signup (req : Request, res: Response) {
         token_amount : 0,
         eth_amount : String(eth_amount)
     }
+
+    const servers = await AppDataSource
+        .getRepository(user)
+        .createQueryBuilder()
+        .select()
+        .where("address = :address", {address:serverAddress})
+        .getOne()
+
+    if(!servers) return res.status(400).send("no servers");
+
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
 
@@ -96,7 +106,7 @@ async function signup (req : Request, res: Response) {
     .createQueryBuilder()
     .update(user)
     .set({eth_amount: ()=> eth_amount2})
-    .where("id = :id", {id:1})
+    .where("id = :id", {id:servers.id})
     .execute()
 
 
