@@ -21,10 +21,16 @@ const task = cron.schedule(
 	async () => {
 		// 주기적으로 실행하고자 하는 함수
 		// 예시
-		getLatestBlock()
+		console.log(await getLatestBlock());
+		const a = await getLatestBlock();
+		console.log("--------------------");
+		console.log(await blockInfo(a));
+		const b = await blockInfo(a);
+		console.log("--------------------");
+		console.log(await txInfo(b.transactions[0]))
 	},
 	{
-		scheduled: false,
+		scheduled: true,
 	}
 );
 
