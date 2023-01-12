@@ -231,8 +231,6 @@ async function minting(req: Request, res:Response) {
         return res.status(400).send("minting error");
     }
 
-    console.log(req.body.uri)
-
     const accounts = await web3.eth.getAccounts();
     const serverAddress = accounts[0];
     const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
@@ -251,6 +249,8 @@ async function minting(req: Request, res:Response) {
 
     await erc20Contract.methods.approve(process.env.CONTRACT721_ADDRESS, 10000).send({from:userss.address})
 
+    
+
     const data = erc721Contract.methods.mintNFT(userss.address, req.body.uri).encodeABI();
 
     const tx = {
@@ -265,26 +265,24 @@ async function minting(req: Request, res:Response) {
     const signedTx = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
     console.log(signedTx)
 
-    // const t = await erc721Contract.methods.mintNFT(userss.address, req.body.uri).send({from: serverAddress, gas : 50000})
-    
-    // console.log(t)
-    // const info = {
-    //     user_id : req.body.user_id,
-    //     URI : req.body.uri,
-    //     tx_hash : signedTx.transactionHash
-    // }
+    if (signedTx) {
+        const token_id = await erc721Contract.methods.getTokenId(req.body.uri).call();
+        const tx_hash = signedTx.transactionHash;
 
-    // const userRepo = AppDataSource.getRepository(nft)
-    // const users = userRepo.create(info);
 
-    // await userRepo
-    //     .save(users)
-    //     .then((data) => {
-    //         res.status(200).send(true);
-    //     })
-    //     .catch((err) => console.log(err));
+        const userRepo = AppDataSource.getRepository(nft)
+        const users = userRepo.create({
+            user_id : req.body.user_id,
+            token_id : token_id,
+            tx_hash : tx_hash
+        })
+        await userRepo.save(users);
 
-    return res.send("success").end()
+        return res.status(200).send("success")
+    }
+
+
+    return res.send("unknown").end()
 }
 
 async function buy_sell(req: Request, res:Response) {

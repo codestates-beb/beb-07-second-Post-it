@@ -31,7 +31,8 @@ async function create_server () {
 
 
         process.env.CONTRACT20_ADDRESS = erc20Deploy.options.address;
-        console.log("erc20 ::" + process.env.CONTRACT20_ADDRESS)
+        const erc20ContractAddress = erc20Deploy.options.address;
+        console.log("erc20 :: " + process.env.CONTRACT20_ADDRESS)
         
 
         const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
@@ -52,23 +53,10 @@ async function create_server () {
         })
         
         process.env.CONTRACT721_ADDRESS = erc721Deploy.options.address;
-        console.log("erc271 :: " + process.env.CONTRACT721_ADDRESS)
+        console.log("erc721 :: " + process.env.CONTRACT721_ADDRESS)
         const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
 
-        const data = erc721Contract.methods.setToken(process.env.CONTRACT721_ADDRESS).encodeABI();
-        console.log(process.env.CONTRACT721_ADDRESS)
-        const setSignTokenTx = await web3.eth.accounts.signTransaction({
-
-            from : serverAddress,
-            to : process.env.CONTRACT721_ADDRESS,
-            gas : 500000,
-            data : data
-
-        }, String(process.env.SERVER_PRIVATE_KEY));
-
-        if (setSignTokenTx.rawTransaction) {
-            await web3.eth.sendSignedTransaction(setSignTokenTx.rawTransaction);
-        }
+        await erc721Contract.methods.setToken(erc20ContractAddress).send({from : serverAddress})
 
         // 디비에 저장
         const userRepo = AppDataSource.getRepository(user);
