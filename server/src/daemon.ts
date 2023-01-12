@@ -19,8 +19,6 @@ const txInfo = async (tx:any) => await web3.eth.getTransaction(tx);
 const task = cron.schedule(
 	"* * * * * *",
 	async () => {
-		// 주기적으로 실행하고자 하는 함수
-		// 예시
 		console.log(await getLatestBlock());
 		const a = await getLatestBlock();
 		console.log("--------------------");
