@@ -6,10 +6,11 @@ import test from "../PostListTest.json";
 function Market() {
     // const [nftList, setNFTList] = useState([]);
     // useEffect(() => {
-    //     axios.get("url")
+    //     axios.get("http://localhost:4000/nft/list")
     //     .then((response) => {
             
-    //         setNFTList(response.data)
+    //         // setNFTList(response.data)
+    //         console.log(response.data)
     //     })
     //     ;
     // }, [])

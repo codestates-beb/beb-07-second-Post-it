@@ -1,65 +1,65 @@
-import { Contract } from "web3-eth-contract";
-import web3 from "../config/web3";
-import bytecode from "../erc20byte";
-require("dotenv").config();
-const abi20 = require("./erc20abi.json");
+// import { Contract } from "web3-eth-contract";
+// import web3 from "../config/web3";
+// import bytecode from "../erc20byte";
+// require("dotenv").config();
+// const abi20 = require("./erc20abi.json");
 
-let contract: Contract;
-let contract_address = process.env.CONTRACT_ADDRESS
+// let contract: Contract;
+// let contract_address = process.env.CONTRACT_ADDRESS
 
-async function Deploy() {
-    console.log("배포 시작")
-    const serverAddress = await getServerAddress();
-    contract = await new web3.eth.Contract(abi20).deploy(bytecode).send({
-        from: serverAddress, 
-        gas: 4700000
-    })
-}
+// async function Deploy() {
+//     console.log("배포 시작")
+//     const serverAddress = await getServerAddress();
+//     contract = await new web3.eth.Contract(abi20).deploy(bytecode).send({
+//         from: serverAddress, 
+//         gas: 4700000
+//     })
+// }
 
-async function existsContract() {
-    contract = new web3.eth.Contract(abi20, contract_address);
-}
+// async function existsContract() {
+//     contract = new web3.eth.Contract(abi20, contract_address);
+// }
 
-async function getServerAddress() {
-    const accounts = await web3.eth.getAccounts();
-    const serverAddress = accounts[0];
-    return serverAddress;
-}
+// async function getServerAddress() {
+//     const accounts = await web3.eth.getAccounts();
+//     const serverAddress = accounts[0];
+//     return serverAddress;
+// }
 
-async function getContractAddress() {
-    console.log("컨트랙트 주소 뽑기")
-    const contractAddress = contract.options.address;
-    return contractAddress;
-}
+// async function getContractAddress() {
+//     console.log("컨트랙트 주소 뽑기")
+//     const contractAddress = contract.options.address;
+//     return contractAddress;
+// }
 
-async function getContractObj() {
-    const contractAddress = await getContractAddress();
-    const testContract = new web3.eth.Contract(abi20, contractAddress);
-    return testContract;
-}
+// async function getContractObj() {
+//     const contractAddress = await getContractAddress();
+//     const testContract = new web3.eth.Contract(abi20, contractAddress);
+//     return testContract;
+// }
 
-async function BalanceOf(address : string) {
-    if (contract == undefined) {
-        await existsContract();
-    }
-    let erc20amount = await contract.methods.balanceOf(address).call();
-    return erc20amount;
-}
+// async function BalanceOf(address : string) {
+//     if (contract == undefined) {
+//         await existsContract();
+//     }
+//     let erc20amount = await contract.methods.balanceOf(address).call();
+//     return erc20amount;
+// }
 
-async function gettransferFrom(from_address : string, to_address : string, token_amount : number){
-    if(contract == undefined) {
-        await existsContract();
-    }
-    await contract.methods.transfer(to_address, token_amount).call();
-    console.log("여기까지오긴옴?");
-    return 12;
-}
+// async function gettransferFrom(from_address : string, to_address : string, token_amount : number){
+//     if(contract == undefined) {
+//         await existsContract();
+//     }
+//     await contract.methods.transfer(to_address, token_amount).call();
+//     console.log("여기까지오긴옴?");
+//     return 12;
+// }
 
-export default {
-    getServerAddress,
-    getContractAddress,
-    BalanceOf,
-    Deploy,
-    getContractObj,
-    gettransferFrom,
-}
+// export default {
+//     getServerAddress,
+//     getContractAddress,
+//     BalanceOf,
+//     Deploy,
+//     getContractObj,
+//     gettransferFrom,
+// }

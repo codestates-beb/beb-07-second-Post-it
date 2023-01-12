@@ -1,4 +1,5 @@
 import { json } from "stream/consumers";
+import Web3Connect from "./config/web3";
 import web3 from "./config/web3";
 import AppDataSource from "./db/data-source";
 import user from "./entity/user";
@@ -9,10 +10,11 @@ const abi721 = require("./erc721abi.json");
 require("dotenv").config()
 // import contractAddress from "./config/addressConfig";
 
+const web3Connect = new Web3Connect();
+
 async function create_server () {
-    const accounts = await web3.eth.getAccounts();
-    const serverAddress = accounts[0];
-    let eth_amount = await web3.eth.getBalance(serverAddress);
+    const serverAddress = await web3Connect.getServerAddress();
+    let eth_amount = await web3Connect.getBalance(serverAddress);
     const users = await AppDataSource
         .getRepository(user)
         .createQueryBuilder()
@@ -23,7 +25,7 @@ async function create_server () {
     if(users) {
         console.log("서버 지갑 이미 있습니다.");
     } else {
-        
+        const web3 = web3Connect._web3;
         let erc20Deploy = await new web3.eth.Contract(abi20).deploy(erc20byte).send({
             from: serverAddress, 
             gas: 4700000

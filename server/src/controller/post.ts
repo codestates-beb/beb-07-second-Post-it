@@ -1,10 +1,13 @@
 import {Request, Response} from "express";
+import Web3Connect from "../config/web3";
 import web3 from "../config/web3";
 import AppDataSource from "../db/data-source";
 import post from "../entity/post";
 import user from "../entity/user";
 const abi20 = require("../erc20abi.json");
 require("dotenv").config()
+
+const web3Connect = new Web3Connect();
 
 async function postlist (req: Request, res: Response) {
     if(!req.query.id) {
@@ -27,10 +30,11 @@ async function wpost (req: Request, res: Response) {
     const title = req.body.title;
     const content = req.body.content;
     const reward_amount = 100000;
-
-    const contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
-    const accounts = await web3.eth.getAccounts();
-    const totalSupply = await contract.methods.totalSupply().call();
+    
+    
+    const contract = await web3Connect.getERC20Contract(abi20, String(process.env.CONTRACT20_ADDRESS));
+    const serverAddress = await web3Connect.getServerAddress();
+    await contract.totalSupply();
 
     const posts = await AppDataSource
         .getRepository(post)
@@ -50,11 +54,15 @@ async function wpost (req: Request, res: Response) {
     .getMany()
 
     const to = users[0].address;
-    const from = accounts[0];
-    await contract.methods.transfer(to,reward_amount).send({from});
+    // const from = accounts[0];
+
+    console.log(to)
+    console.log(serverAddress)
+
+    await contract.transfer(to, serverAddress, reward_amount);
     
-    const to_token = await contract.methods.balanceOf(to).call();
-    const from_token = await contract.methods.balanceOf(from).call();
+    const to_token = await contract.balanceOf(to);
+    const from_token = await contract.balanceOf(serverAddress);
 
     const userRepo = AppDataSource.getRepository(user);
 
@@ -62,7 +70,7 @@ async function wpost (req: Request, res: Response) {
         .createQueryBuilder()
         .update(user)
         .set({token_amount: () => `${from_token}`})
-        .where("address = :address", {address:from})
+        .where("address = :address", {address:serverAddress})
         .execute()
 
         await userRepo

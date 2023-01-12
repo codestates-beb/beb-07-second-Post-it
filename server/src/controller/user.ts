@@ -1,13 +1,16 @@
 import {Request, Response} from "express";
 import AppDataSource from "../db/data-source";
-import web3 from "../config/web3"
+// import web3 from "../config/web3"
 import user from "../entity/user";
 import post from "../entity/post";
 import nft from "../entity/nft";
-import { updateSpreadAssignment } from "typescript";
 const abi20 = require("../erc20abi.json");
 const abi721 = require("../erc721abi.json");
 require("dotenv").config()
+
+import Web3Connect from "../config/web3";
+
+const web3Connect = new Web3Connect();
 
 async function insert (req : Request, res: Response) {
     const info = {
@@ -42,8 +45,7 @@ async function signup (req : Request, res: Response) {
         return res.status(400).send("signup error");
     }
 
-    const accounts = await web3.eth.getAccounts();
-    const serverAddress = accounts[0];
+    const serverAddress = await web3Connect.getServerAddress();
 
     const nickname = req.body.nickname;
     
@@ -61,31 +63,18 @@ async function signup (req : Request, res: Response) {
         });
     }
     
-    const address = await web3.eth.personal.newAccount(String(req.body.password));
+    const userAddress = await web3Connect.createAddress(String(req.body.password));
 
-    await web3.eth.accounts.signTransaction({
-        to: address,
-        value: '1000000000000000000', //1이더
-        gas: 21000,
-    }, process.env.SERVER_PRIVATE_KEY || "", function (err, result) {
-        if(err) {
-            console.log(err);
-            return res.status(400).send("지갑생성 오류");
-        }
-        if(result.rawTransaction===undefined) {
-            return res.status(400).send("result.rawTransaction이 없음");
-        }
-        web3.eth.sendSignedTransaction(result.rawTransaction);
-    });
+    await web3Connect.sendEth(userAddress);
 
-    const eth_amount = await web3.eth.getBalance(address);
+    const createUserEth = await web3Connect.getBalance(userAddress)
 
     const info = {
         nickname : nickname,
         password : req.body.password,
-        address : address,
+        address : userAddress,
         token_amount : 0,
-        eth_amount : String(eth_amount)
+        eth_amount : String(createUserEth)
     }
 
     const servers = await AppDataSource
@@ -100,15 +89,14 @@ async function signup (req : Request, res: Response) {
     const userRepo = AppDataSource.getRepository(user);
     const userss = userRepo.create(info);
 
-    const eth_amount2 = await web3.eth.getBalance(serverAddress);
+    const serverEth = await web3Connect.getBalance(serverAddress)
 
     await userRepo
     .createQueryBuilder()
     .update(user)
-    .set({eth_amount: ()=> eth_amount2})
+    .set({eth_amount: () => serverEth})
     .where("id = :id", {id:servers.id})
     .execute()
-
 
     await userRepo
     .save(userss)
@@ -185,7 +173,7 @@ async function send(req : Request, res:Response) {
     if(!req.body.to_address || !req.body.from_address || !req.body.token_amount) {
         return res.status(400).send(false);
     }
-    const contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
+    const contract = await web3Connect.getERC20Contract(abi20, String(process.env.CONTRACT20_ADDRESS));
 
     const from = req.body.from_address;
     const to = req.body.to_address;
@@ -200,12 +188,12 @@ async function send(req : Request, res:Response) {
 
     if(!userFrom) return res.status(400).send("no userFrom");
 
-    await web3.eth.personal.unlockAccount(from,userFrom.password, 600);
+    await web3Connect.unlockAccount(from, userFrom.password, 600);
 
-    await contract.methods.transfer(to,amount).send({from});
+    await contract.transfer(to, from, amount);
 
-    const to_token = await contract.methods.balanceOf(to).call();
-    const from_token = await contract.methods.balanceOf(from).call();
+    const to_token = await contract.balanceOf(to);
+    const from_token = await contract.balanceOf(from);
 
     const userRepo = AppDataSource.getRepository(user);
 
@@ -231,10 +219,10 @@ async function minting(req: Request, res:Response) {
         return res.status(400).send("minting error");
     }
 
-    const accounts = await web3.eth.getAccounts();
-    const serverAddress = accounts[0];
-    const erc721Contract = new web3.eth.Contract(abi721, process.env.CONTRACT721_ADDRESS);
-    const erc20Contract = new web3.eth.Contract(abi20, process.env.CONTRACT20_ADDRESS);
+    const serverAddress = await web3Connect.getServerAddress();
+    const erc721Contract = await web3Connect.getERC721Contract(abi721, String(process.env.CONTRACT721_ADDRESS));
+    const erc20Contract = await web3Connect.getERC20Contract(abi20, String(process.env.CONTRACT20_ADDRESS));
+
 
     const userss = await AppDataSource
         .getRepository(user)
@@ -245,30 +233,14 @@ async function minting(req: Request, res:Response) {
 
     if(!userss) return res.status(400).send("no userss");
 
-    await web3.eth.personal.unlockAccount(userss.address,userss.password, 600)
+    await web3Connect.unlockAccount(userss.address,userss.password, 600);
 
-    await erc20Contract.methods.approve(process.env.CONTRACT721_ADDRESS, 10000).send({from:userss.address})
+    await erc20Contract.approve(String(process.env.CONTRACT721_ADDRESS), userss.address, 10000)
 
-    
+    const tx_hash = await erc721Contract.mintNFT(userss.address, req.body.uri, serverAddress);
 
-    const data = erc721Contract.methods.mintNFT(userss.address, req.body.uri).encodeABI();
-
-    const tx = {
-        from: serverAddress,
-        to: process.env.CONTRACT721_ADDRESS,
-        gas: 5000000,
-        data: data,
-    };
-    const signPromise = await web3.eth.accounts.signTransaction(tx, String(process.env.SERVER_PRIVATE_KEY));
-    if(!signPromise.rawTransaction) return res.status(400).send("signpromise error");
-    console.log("here")
-    const signedTx = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
-    console.log(signedTx)
-
-    if (signedTx) {
-        const token_id = await erc721Contract.methods.getTokenId(req.body.uri).call();
-        const tx_hash = signedTx.transactionHash;
-
+    if (tx_hash) {
+        const token_id = await erc721Contract.getTokenId(req.body.uri);
 
         const userRepo = AppDataSource.getRepository(nft)
         const users = userRepo.create({
