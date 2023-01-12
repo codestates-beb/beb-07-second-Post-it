@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const models = require("./models");
+// const models = require("./models");
 const Web3 = require("web3");
 const web3 = new Web3('http://127.0.0.1:7545');
 
